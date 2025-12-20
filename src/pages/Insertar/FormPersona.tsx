@@ -29,7 +29,7 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
   const form = Form.useFormInstance();
 
   /* ---------------------------------- State --------------------------------- */
-  const [isEdit, _] = useState(!!edit);
+  const [isEdit, setIsEdit] = useState(!!edit);
 
   /* ---------------------------------- Watch --------------------------------- */
   const isLider = Form.useWatch("esLider", form);
@@ -61,6 +61,7 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
     if (isEdit && data) {
       if (puestoVotacionWatch) {
         form.setFieldValue("mesaVotacion", data.mesaVotacion?.id);
+        setIsEdit(false);
       }
     }
   }, [isEdit, data, puestoVotacionWatch]);
@@ -92,6 +93,7 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
         <InputNumber
           className="w-full!"
           min={0}
+          max={9999999999}
           precision={0}
           inputMode="numeric"
         />
@@ -105,7 +107,7 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
         name="telefono"
         label="Telefono"
       >
-        <Input />
+        <Input maxLength={10}/>
       </Form.Item>
       <Form.Item className="mb-0!" label="Ubicacion">
         <Space.Compact block>

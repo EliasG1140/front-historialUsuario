@@ -1,6 +1,10 @@
 import { useGet } from "@hooks";
+import { usePersonasFilterStore } from "@stores";
+import { useNavigate } from "react-router";
 
 export const Home = () => {
+  const navigate = useNavigate();
+  const setFilters = usePersonasFilterStore((state) => state.setFilters);
   const { categorizacion } = useGet();
 
   const ordenadas = [...(categorizacion ?? [])].sort(
@@ -26,7 +30,10 @@ export const Home = () => {
           <div className="flex flex-col h-full gap-1">
             {ordenadas.map((cat) => (
               <button
-                // onClick={() => console.log(cat)}
+                onClick={() => {
+                  setFilters({ onlyLider: true, categoriaId: cat.id });
+                  navigate("/home/consultar/personas");
+                }}
                 key={cat.id}
                 className="
                   flex-1 flex items-center justify-center

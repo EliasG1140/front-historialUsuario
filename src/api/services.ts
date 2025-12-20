@@ -225,14 +225,20 @@ export const getPersonas = async ({
   lideres,
   puestoVotacion,
   mesaVotacion,
+  codigoB,
+  codigoC,
+  categoria,
 }: {
   lider?: number;
   lideres?: boolean;
   puestoVotacion?: number;
   mesaVotacion?: number;
+  codigoB?: number;
+  codigoC?: number;
+  categoria?: number;
 }): Promise<IGetPersona[]> => {
   const { data } = await apiClient.get<IGetPersona[]>(
-    `/personas?lider=${lider}&lideres=${lideres}&puestoVotacion=${puestoVotacion}&mesaVotacion=${mesaVotacion}`,
+    `/personas?lider=${lider}&lideres=${lideres}&puestoVotacion=${puestoVotacion}&mesaVotacion=${mesaVotacion}&codigoB=${codigoB}&codigoC=${codigoC}&categoria=${categoria}`,
     {
       needAuth: true,
     }
@@ -281,6 +287,12 @@ export const getUsuarios = async (): Promise<IGetUsers[]> => {
   return data;
 };
 
+export const putPassword = async (payload: any): Promise<any> => {
+  await apiClient.put<any>("/auth/usuario/password", payload, {
+    needAuth: true,
+  });
+};
+
 export const togglePutUsuario = async (id: string): Promise<any> => {
   await apiClient.put<any>(`/auth/usuario/${id}/toggle`, null, {
     needAuth: false,
@@ -288,15 +300,21 @@ export const togglePutUsuario = async (id: string): Promise<any> => {
 };
 
 export const postUsuario = async (payload: any): Promise<any> => {
-  await apiClient.post<any>("/auth/register", payload, {
+  const result = await apiClient.post<any>("/auth/register", payload, {
     needAuth: false,
   });
+  return result;
 };
 
 export const putRecoveryUsuario = async (id: string): Promise<any> => {
-  await apiClient.put<any>(`/auth/usuario/${id}/recovery`, null, {
-    needAuth: false,
-  });
+  const result = await apiClient.put<any>(
+    `/auth/usuario/${id}/recovery`,
+    null,
+    {
+      needAuth: false,
+    }
+  );
+  return result;
 };
 
 export const putChangeRoleUsuario = async (
@@ -331,11 +349,27 @@ export const getConsultaPuestoVotacion =
 /* -------------------------------------------------------------------------- */
 export const getExportPersonas = async (payload: any): Promise<Blob> => {
   const { data } = await apiClient.get<Blob>(
-    `/personas/excel?lider=${payload.lider}&lideres=${payload.lideres}&puestoVotacion=${payload.puestoVotacion}&mesaVotacion=${payload.mesaVotacion}`,
+    `/personas/excel?lider=${payload.lider}&lideres=${payload.lideres}&puestoVotacion=${payload.puestoVotacion}&mesaVotacion=${payload.mesaVotacion}&codigoB=${payload.codigoB}&codigoC=${payload.codigoC}&categoria=${payload.categoria}`,
     {
       needAuth: true,
       responseType: "blob",
     }
   );
+  return data;
+};
+
+export const getExportLideres = async (): Promise<Blob> => {
+  const { data } = await apiClient.get<Blob>(`/personas/lideres/excel`, {
+    needAuth: true,
+    responseType: "blob",
+  });
+  return data;
+};
+
+export const getExportPuestoVotacion = async (): Promise<Blob> => {
+  const { data } = await apiClient.get<Blob>(`/votacion/puestos/excel`, {
+    needAuth: true,
+    responseType: "blob",
+  });
   return data;
 };

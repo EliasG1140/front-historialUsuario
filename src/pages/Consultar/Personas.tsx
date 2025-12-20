@@ -21,8 +21,14 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router";
 
 export const Personas = () => {
-  const { liderId, puestoVotacionId, mesaVotacionId, clearFilters } =
-    usePersonasFilterStore();
+  const {
+    liderId,
+    puestoVotacionId,
+    mesaVotacionId,
+    clearFilters,
+    categoriaId,
+    onlyLider,
+  } = usePersonasFilterStore();
   const navigate = useNavigate();
   const user = useUserStore((state) => state.user);
 
@@ -46,6 +52,7 @@ export const Personas = () => {
     codigosC,
     codigosB,
     removePersona,
+    categorias,
   } = useGet(puestoVotacionWatch, filters);
   /* --------------------------------- Handle --------------------------------- */
   const onSubmit = (values: any) => {
@@ -54,6 +61,9 @@ export const Personas = () => {
       lideres: values.lideres || undefined,
       puestoVotacion: values.puestoVotacion || undefined,
       mesaVotacion: values.mesaVotacion || undefined,
+      codigoC: values.codigoC || undefined,
+      codigoB: values.codigoB || undefined,
+      categoria: values.categoria || undefined,
     });
   };
 
@@ -100,16 +110,14 @@ export const Personas = () => {
         key: "cedula",
       },
       {
+        title: "Apodo",
+        dataIndex: "apodo",
+        key: "apodo",
+      },
+      {
         title: "Telefono",
         dataIndex: "telefono",
         key: "telefono",
-      },
-      {
-        title: "Lenguas",
-        dataIndex: "lenguas",
-        key: "lenguas",
-        render: (lenguas: { id: number; nombre: string }[]) =>
-          lenguas.map((l) => l.nombre).join(", "),
       },
       {
         title: "Barrio",
@@ -121,6 +129,13 @@ export const Personas = () => {
         title: "Direccion",
         dataIndex: "direccion",
         key: "direccion",
+      },
+      {
+        title: "Lenguas",
+        dataIndex: "lenguas",
+        key: "lenguas",
+        render: (lenguas: { id: number; nombre: string }[]) =>
+          lenguas.map((l) => l.nombre).join(", "),
       },
       {
         title: "Puesto de votación",
@@ -135,7 +150,13 @@ export const Personas = () => {
           mesaVotacion?.nombre,
       },
       {
-        title: "Beneficios",
+        title: "Codigos C",
+        dataIndex: "codigoC",
+        key: "codigoC",
+        render: (codigosC: { id: number; nombre: string }) => codigosC.nombre,
+      },
+      {
+        title: "Codigos B",
         dataIndex: "codigosB",
         key: "beneficios",
         render: (codigosB: { id: number; nombre: string }[]) =>
@@ -184,10 +205,21 @@ export const Personas = () => {
   useEffect(() => {
     if (isLider) {
       form.setFieldValue("lider", null);
+    } else {
+      form.setFieldValue("categoria", null);
     }
   }, [isLider]);
 
   useEffect(() => {
+    if (onlyLider) {
+      form.setFieldValue("lideres", true);
+      setFilters((prev: any) => ({ ...prev, lideres: true }));
+    }
+    if (categoriaId) {
+      form.setFieldValue("categoria", categoriaId);
+      clearFilters();
+      setFilters((prev: any) => ({ ...prev, categoria: categoriaId }));
+    }
     if (liderId) {
       form.setFieldValue("lider", liderId);
       clearFilters();
@@ -201,7 +233,15 @@ export const Personas = () => {
         puestoVotacion: puestoVotacionId,
       }));
     }
-  }, [liderId, puestoVotacionId, mesaVotacionId, form, clearFilters]);
+  }, [
+    liderId,
+    puestoVotacionId,
+    mesaVotacionId,
+    form,
+    clearFilters,
+    categoriaId,
+    onlyLider,
+  ]);
 
   useEffect(() => {
     if (puestoVotacionId && !puestoVotacionWatch) {
@@ -245,20 +285,30 @@ export const Personas = () => {
     <div className="w-full h-full flex flex-col gap-4">
       <Form layout="vertical" form={form} onFinish={onSubmit}>
         <div className="grid grid-cols-10 gap-4">
-          <Form.Item
-            label="Lideres"
-            name="lideres"
-            valuePropName="checked"
-            className="mb-0!"
-            initialValue={false}
-          >
-            <Checkbox className="scale-150" />
-          </Form.Item>
-          <Form.Item
-            label="Lider a cargo"
-            className="col-span-2 mb-0!"
-            name="lider"
-          >
+          <div className="flex">
+            <Form.Item
+              label="Lideres"
+              name="lideres"
+              valuePropName="checked"
+              className="mb-0!"
+              initialValue={false}
+            >
+              <Checkbox className="scale-150" />
+            </Form.Item>
+            <Form.Item
+              label="Categoria"
+              name="categoria"
+              className="mb-0! w-full"
+            >
+              <Select
+                allowClear
+                disabled={!isLider}
+                placeholder="Categoria"
+                options={dataToSelectOptions(categorias ?? [], "id", "nombre")}
+              />
+            </Form.Item>
+          </div>
+          <Form.Item label="Lider a cargo" className="mb-0!" name="lider">
             <Select
               allowClear
               showSearch={{ optionFilterProp: "label" }}
@@ -290,16 +340,22 @@ export const Personas = () => {
               options={dataToSelectOptions(mesasVotacion ?? [], "id", "nombre")}
             />
           </Form.Item>
-          {/*           <Form.Item label="Codigo C" className="mb-0!">
+
+          <Form.Item label="Codigo C" className="mb-0!" name="codigoC">
             <Select
+              allowClear
+              placeholder="Seleccione un codigo C"
               options={dataToSelectOptions(codigosC ?? [], "id", "nombre")}
             />
           </Form.Item>
-          <Form.Item label="Codigo B" className="mb-0!">
+
+          <Form.Item label="Codigo B" className="mb-0!" name="codigoB">
             <Select
+              allowClear
+              placeholder="Seleccione un codigo B"
               options={dataToSelectOptions(codigosB ?? [], "id", "nombre")}
             />
-          </Form.Item> */}
+          </Form.Item>
           <div className="col-span-2 flex items-center gap-2">
             <Form.Item label=" " className="mb-0!">
               <Button type="primary" onClick={() => form.submit()}>

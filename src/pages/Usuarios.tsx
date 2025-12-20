@@ -105,9 +105,6 @@ const CustomRow: FC<
 
     return {
       items,
-      onClick: ({ key }) => {
-        console.log(`Acción ${key} para:`, record);
-      },
     };
   }, [record]);
 
@@ -130,6 +127,10 @@ export const Usuarios = () => {
   /* ---------------------------------- Form ---------------------------------- */
   const [form] = Form.useForm();
 
+  /* ---------------------------------- Watch --------------------------------- */
+  const roleWatch = Form.useWatch("Role", form);
+  const isAdministrador = roleWatch !== "Digitalizador";
+
   /* --------------------------------- Handle --------------------------------- */
   const onSubmit = (values: any) => {
     const payload = { ...values, cedula: String(values.cedula) };
@@ -138,34 +139,14 @@ export const Usuarios = () => {
     });
   };
 
-  /*  const handleFillForm = (record: any) => {
-    form.setFieldsValue({
-      nombre: record.nombre,
-      mesas: record.cantidadMesas,
-    });
-    setSelectItem(record);
-    setIsEdit(true);
-  }; */
-
-  /*  const handleCancelEdit = () => {
-    setIsEdit(false);
-    setSelectItem(null);
-    form.resetFields();
-  }; */
-
-  /*  const handleDelete = (record: any) => {
-    const id = record.id;
-    removePuestoVotacion(id);
-  }; */
-
   /* ---------------------------------- Table --------------------------------- */
   const tableProps: TableProps<any> = {
     size: "middle",
     rowKey: "id",
     bordered: true,
     onRow: (record) => ({
-      onContextMenu: (event) => event.preventDefault(), // Evita el menú contextual por defecto del navegador
-      record, // Se pasa el record al CustomRow sin tocar el DOM
+      onContextMenu: (event) => event.preventDefault(),
+      record,
     }),
     components: {
       body: {
@@ -234,26 +215,13 @@ export const Usuarios = () => {
           <Input />
         </Form.Item>
 
-        <Form.Item
+        {/*  <Form.Item
           label="Contraseña"
           name="password"
           rules={[{ required: true, message: "Campo requerido." }]}
         >
           <Input.Password />
-        </Form.Item>
-
-        <Form.Item
-          label="Cedula"
-          name="cedula"
-          rules={[{ required: true, message: "Campo requerido." }]}
-        >
-          <InputNumber
-            className="w-full!"
-            min={0}
-            precision={0}
-            inputMode="numeric"
-          />
-        </Form.Item>
+        </Form.Item> */}
 
         <Form.Item
           label="Rol"
@@ -271,6 +239,20 @@ export const Usuarios = () => {
                 value: "Digitalizador",
               },
             ]}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label="Cedula"
+          name="cedula"
+          rules={[{ required: !isAdministrador, message: "Campo requerido." }]}
+        >
+          <InputNumber
+            className="w-full!"
+            min={0}
+            precision={0}
+            inputMode="numeric"
+            disabled={isAdministrador}
           />
         </Form.Item>
 

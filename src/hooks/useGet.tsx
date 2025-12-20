@@ -40,6 +40,7 @@ import {
   putChangeRoleUsuario,
   getLideresList,
   getConsultaPuestoVotacion,
+  putPassword,
 } from "@api";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { notify } from "@utils";
@@ -51,6 +52,9 @@ export const useGet = (
     lideres?: boolean | null;
     puestoVotacion?: number | null;
     mesaVotacion?: number | null;
+    codigoB?: number | null;
+    codigoC?: number | null;
+    categoria?: number | null;
   }
 ) => {
   /* ---------------------------------- Home ---------------------------------- */
@@ -301,6 +305,15 @@ export const useGet = (
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET.CONSULTA_PUESTO_VOTACION],
       });
+      notify.success("Puesto de votación actualizado correctamente");
+    },
+    onError: (error: any) => {
+      const {
+        response: {
+          data: { title },
+        },
+      } = error;
+      notify.error(title ?? "Error al actualizar puesto de votación");
     },
   });
 
@@ -361,6 +374,9 @@ export const useGet = (
         lideres: personaFilters?.lideres ?? undefined,
         puestoVotacion: personaFilters?.puestoVotacion ?? undefined,
         mesaVotacion: personaFilters?.mesaVotacion ?? undefined,
+        codigoB: personaFilters?.codigoB ?? undefined,
+        codigoC: personaFilters?.codigoC ?? undefined,
+        categoria: personaFilters?.categoria ?? undefined,
       }),
     staleTime: 0,
     refetchInterval: 5000,
@@ -438,9 +454,31 @@ export const useGet = (
     staleTime: 0,
   });
 
+  const { mutateAsync: restorePassword } = useMutation({
+    mutationFn: (payload: any) => putPassword(payload),
+    onSuccess: () => {
+      notify.success("Contraseña actualizada correctamente");
+    },
+    onError: (error: any) => {
+      const {
+        response: {
+          data: { title },
+        },
+      } = error;
+      notify.error(title ?? "Error al actualizar contraseña");
+    },
+  });
+
   const { mutateAsync: addUsuario } = useMutation({
     mutationFn: (payload: any) => postUsuario(payload),
-    onSuccess: () => {
+    onSuccess: ({ data }) => {
+      const { password } = data as any;
+      notify.openNotification(
+        "success",
+        "Usuario agregado",
+        `La contraseña es: ${password} y se ha copiado al portapapeles.`
+      );
+      navigator.clipboard.writeText(password);
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET.USUARIOS],
       });
@@ -461,6 +499,7 @@ export const useGet = (
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET.USUARIOS],
       });
+      notify.success("Usuario actualizado correctamente");
     },
     onError: (error: any) => {
       const {
@@ -474,8 +513,14 @@ export const useGet = (
 
   const { mutateAsync: recoveryUsuario } = useMutation({
     mutationFn: (id: string) => putRecoveryUsuario(id),
-    onSuccess: () => {
-      notify.success("Usuario recuperado correctamente");
+    onSuccess: ({ data }) => {
+      const { newPassword } = data as any;
+      notify.openNotification(
+        "success",
+        "Contraseña recuperada",
+        `Su nueva contraseña es: ${newPassword} y se ha copiado al portapapeles.`
+      );
+      navigator.clipboard.writeText(newPassword);
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET.USUARIOS],
       });
@@ -561,6 +606,7 @@ export const useGet = (
     toggleUsuario,
     recoveryUsuario,
     changeRoleUsuario,
+    restorePassword,
     listLideres,
     consultaPuestoVotacion,
   };

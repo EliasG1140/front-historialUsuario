@@ -1,5 +1,14 @@
 import { Outlet, useLocation, useNavigate } from "react-router";
-import { Avatar, Dropdown, Menu, type MenuProps } from "antd";
+import {
+  Avatar,
+  Button,
+  Dropdown,
+  Form,
+  Input,
+  Menu,
+  Modal,
+  type MenuProps,
+} from "antd";
 import {
   DatabaseOutlined,
   HomeOutlined,
@@ -8,7 +17,8 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { useUserStore } from "@stores";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { useGet } from "@hooks";
 
 const menuKeys = [
   "home",
@@ -28,6 +38,13 @@ export const LayoutApp = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const user = useUserStore((state) => state.user);
+  const { restorePassword } = useGet();
+
+  /* ---------------------------------- State --------------------------------- */
+  const [openModal, setOpenModal] = useState(false);
+
+  /* ---------------------------------- Form ---------------------------------- */
+  const [form] = Form.useForm();
 
   /* ------------------------------ Menú usuario ------------------------------ */
   const userMenu = useMemo(() => {
@@ -48,6 +65,11 @@ export const LayoutApp = () => {
         disabled: true,
       },
       { type: "divider" },
+      {
+        key: "changePassword",
+        label: "Cambiar contraseña",
+        onClick: () => setOpenModal(true),
+      },
       {
         key: "termino",
         label: "Términos y condiciones",
@@ -183,6 +205,18 @@ export const LayoutApp = () => {
     }
   };
 
+  const onSumit = (values: any) => {
+    restorePassword(values).then(() => {
+      setOpenModal(false);
+      form.resetFields();
+    });
+  };
+
+  const onCancel = () => {
+    form.resetFields();
+    setOpenModal(false);
+  };
+
   const pathParts = location.pathname.split("/").filter(Boolean);
   let selectedKey = "home";
 
@@ -194,7 +228,7 @@ export const LayoutApp = () => {
   }
 
   return (
-    <div className="w-full max-w-7xl h-[900px] bg-white rounded-2xl shadow-lg relative">
+    <div className="w-full h-full bg-white shadow-lg relative">
       <Menu
         mode="horizontal"
         items={items}
@@ -216,9 +250,44 @@ export const LayoutApp = () => {
           </button>
         </Dropdown>
       </div>
-      <div className="w-full h-[854px] overflow-scroll px-8 pb-2 pt-4">
+      <div className="w-full h-full overflow-scroll px-8 pb-2 pt-4">
         <Outlet />
       </div>
+      <Modal
+        open={openModal}
+        onCancel={onCancel}
+        footer={null}
+        closable={false}
+        centered
+      >
+        <p className="font-semibold text-blue-500 text-xl">
+          Cambiar contraseña
+        </p>
+        <Form layout="vertical" form={form} onFinish={onSumit}>
+          <Form.Item
+            label="Contraseña actual"
+            className="mb-1!"
+            name="currentPassword"
+          >
+            <Input.Password />
+          </Form.Item>
+          <Form.Item
+            label="Nueva contraseña"
+            className="mb-0!"
+            name="newPassword"
+          >
+            <Input.Password />
+          </Form.Item>
+          <div className="flex justify-end gap-2 mt-2">
+            <Button type="primary" danger>
+              Cancelar
+            </Button>
+            <Button type="primary" htmlType="submit">
+              Guardar
+            </Button>
+          </div>
+        </Form>
+      </Modal>
     </div>
   );
 };

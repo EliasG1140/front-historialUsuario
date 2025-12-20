@@ -42,7 +42,7 @@ export const PuestoVotacion = () => {
   const handleFillForm = (record: any) => {
     form.setFieldsValue({
       nombre: record.nombre,
-      mesas: record.cantidadMesas,
+      mesas: record?.mesas?.length,
     });
     setSelectItem(record);
     setIsEdit(true);
