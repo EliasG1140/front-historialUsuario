@@ -12,5 +12,6 @@ export const QUERY_KEYS = {
     PERSONAS: "get_personas",
     USUARIOS: "get_usuarios",
     CONSULTA_PUESTO_VOTACION: "get_consulta_puesto_votacion",
+    IS_USER_BLOCKED: "is_user_blocked",
   },
 };

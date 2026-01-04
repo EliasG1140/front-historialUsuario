@@ -19,6 +19,13 @@ export const login = async (payload: any) => {
   return data;
 };
 
+export const isUserBlocked = async (): Promise<boolean> => {
+  const { data } = await apiClient.get<boolean>(`/auth/usuario/blocked`, {
+    needAuth: true,
+  });
+  return data;
+};
+
 //* -------------------------------------------------------------------------- */
 //*                                    HOME                                    */
 //* -------------------------------------------------------------------------- */

@@ -108,6 +108,46 @@ export interface IGetPersonaById {
   lastModifiedBy?: string;
 }
 
+/* --------------------------------- Lideres -------------------------------- */
+export interface IGetLideres {
+  id: number;
+  nombre: string;
+  apellido: string;
+  cedula: string;
+  apodo: string | null;
+  telefono: string;
+  direccion: string;
+  descripcion: string | null;
+  isLider: true;
+  barrio: {
+    id: number;
+    nombre: string;
+  };
+  codigoC: {
+    id: number;
+    nombre: string;
+  };
+  lenguas: {
+    id: number;
+    nombre: string;
+  }[];
+  liderId: null;
+  mesaVotacion: {
+    id: number;
+    nombre: string;
+    puestoVotacion: {
+      id: number;
+      nombre: string;
+    };
+  };
+  codigosB: {
+    id: number;
+    nombre: string;
+  }[];
+  personasACargoIds: number[];
+  personasACargoCount: number;
+}
+
 /* ------------------------ Consulta puesto votacion ------------------------ */
 export interface IConsultaPuestoVotacion {
   value: {

@@ -41,6 +41,7 @@ import {
   getLideresList,
   getConsultaPuestoVotacion,
   putPassword,
+  isUserBlocked,
 } from "@api";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { notify } from "@utils";
@@ -57,6 +58,14 @@ export const useGet = (
     categoria?: number | null;
   }
 ) => {
+  /* ---------------------------------- Auth ---------------------------------- */
+  const { data: isBlocked } = useQuery({
+    queryKey: [QUERY_KEYS.GET.IS_USER_BLOCKED],
+    queryFn: () => isUserBlocked(),
+    staleTime: 0,
+    refetchInterval: 3000,
+  });
+
   /* ---------------------------------- Home ---------------------------------- */
   const { data: categorizacion } = useQuery({
     queryKey: [QUERY_KEYS.GET.CATEGORIZACION],
@@ -609,5 +618,6 @@ export const useGet = (
     restorePassword,
     listLideres,
     consultaPuestoVotacion,
+    isBlocked,
   };
 };

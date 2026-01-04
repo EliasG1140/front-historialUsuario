@@ -28,7 +28,20 @@ export const EditPersona = () => {
       apodo: values?.apodo || null,
       descripcion: values?.descripcion || null,
       lider: values?.lider || null,
+      barrio: values?.barrio || null,
     };
+    if (values.codigob?.length !== 0) {
+      payload.codigob = values.codigob;
+    } else {
+      payload.codigob = null;
+    }
+
+    if(values.lengua?.length !== 0) {
+      payload.lengua = values.lengua;
+    } else {
+      payload.lengua = null;
+    }
+
     updatePersona(payload)
       .then(() => {
         notify.success("Persona actualizada con éxito");

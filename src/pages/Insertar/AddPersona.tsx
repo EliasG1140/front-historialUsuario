@@ -18,6 +18,7 @@ export const AddPersona = () => {
       apodo: values?.apodo || null,
       descripcion: values?.descripcion || null,
       lider: values?.lider || null,
+      barrio: values?.barrio || null,
     };
     addPersona(payload)
       .then(() => {

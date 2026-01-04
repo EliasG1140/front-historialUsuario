@@ -95,29 +95,29 @@ export const Personas = () => {
     rowKey: "id",
     columns: [
       {
-        title: "Nombre",
+        title: "Cedula",
+        dataIndex: "cedula",
+        key: "cedula",
+      },
+      {
+        title: "Nombres",
         dataIndex: "nombre",
         key: "nombre",
       },
       {
-        title: "Apellido",
+        title: "Apellidos",
         dataIndex: "apellido",
         key: "apellido",
       },
       {
-        title: "Numero Doc",
-        dataIndex: "cedula",
-        key: "cedula",
+        title: "Teléfono",
+        dataIndex: "telefono",
+        key: "telefono",
       },
       {
         title: "Apodo",
         dataIndex: "apodo",
         key: "apodo",
-      },
-      {
-        title: "Telefono",
-        dataIndex: "telefono",
-        key: "telefono",
       },
       {
         title: "Barrio",

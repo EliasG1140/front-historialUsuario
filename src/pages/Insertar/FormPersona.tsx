@@ -14,7 +14,7 @@ import {
   Select,
   Space,
 } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 
 interface IFormPersonaProps {
@@ -43,8 +43,19 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
     codigosB,
     codigosC,
     mesasVotacion,
-    lideres,
+    listLideres,
   } = useGet(puestoVotacionWatch);
+
+  /* ---------------------------------- Memo ---------------------------------- */
+  const lideres = useMemo(() => {
+    const data = listLideres ?? [];
+    return data.map((lider) => ({
+      ...lider,
+      nombreCompleto: `${lider.nombre} ${lider.apellido}${
+        lider.apodo ? ` (${lider.apodo})` : ""
+      }`,
+    }));
+  }, [listLideres]);
 
   /* --------------------------------- Effects -------------------------------- */
   useEffect(() => {
@@ -71,6 +82,20 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
       <Form.Item
         rules={[{ required: true, message: "Campo requerido." }]}
         className="mb-0!"
+        name="cedula"
+        label="Cedula"
+      >
+        <InputNumber
+          className="w-full!"
+          min={0}
+          max={9999999999}
+          precision={0}
+          inputMode="numeric"
+        />
+      </Form.Item>
+      <Form.Item
+        rules={[{ required: true, message: "Campo requerido." }]}
+        className="mb-0!"
         name="nombre"
         label="Nombre"
       >
@@ -84,59 +109,33 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
       >
         <Input />
       </Form.Item>
-      <Form.Item
-        rules={[{ required: true, message: "Campo requerido." }]}
-        className="mb-0!"
-        name="cedula"
-        label="Cedula"
-      >
-        <InputNumber
-          className="w-full!"
-          min={0}
-          max={9999999999}
-          precision={0}
-          inputMode="numeric"
-        />
-      </Form.Item>
-      <Form.Item className="mb-0!" name="apodo" label="Apodo">
-        <Input />
-      </Form.Item>
+
       <Form.Item
         rules={[{ required: true, message: "Campo requerido." }]}
         className="mb-0!"
         name="telefono"
         label="Telefono"
       >
-        <Input maxLength={10}/>
+        <Input maxLength={10} />
+      </Form.Item>
+      <Form.Item className="mb-0!" name="apodo" label="Apodo">
+        <Input />
       </Form.Item>
       <Form.Item className="mb-0!" label="Ubicacion">
         <Space.Compact block>
-          <Form.Item
-            rules={[{ required: true, message: "Campo requerido." }]}
-            className="mb-0! w-[50%]"
-            name="barrio"
-          >
+          <Form.Item className="mb-0! w-[50%]" name="barrio">
             <Select
               options={dataToSelectOptions(barrios ?? [], "id", "nombre")}
               placeholder="Seleccione un barrio"
             />
           </Form.Item>
 
-          <Form.Item
-            rules={[{ required: true, message: "Campo requerido." }]}
-            className="mb-0! w-[50%]"
-            name="direccion"
-          >
+          <Form.Item className="mb-0! w-[50%]" name="direccion">
             <Input placeholder="Direccion" />
           </Form.Item>
         </Space.Compact>
       </Form.Item>
-      <Form.Item
-        rules={[{ required: true, message: "Campo requerido." }]}
-        className="mb-0!"
-        name="lengua"
-        label="Lengua"
-      >
+      <Form.Item className="mb-0!" name="lengua" label="Lengua">
         <Select
           options={dataToSelectOptions(lenguas ?? [], "id", "nombre")}
           placeholder="Seleccione una o varias lenguas"
@@ -196,7 +195,11 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
           showSearch={{ optionFilterProp: "label" }}
           placeholder="Seleccione un lider asignado"
           disabled={isLider}
-          options={dataToSelectOptions(lideres ?? [], "id", "nombre")}
+          options={dataToSelectOptions(lideres ?? [], "id", "nombre", false, {
+            combineLabel: true,
+            separator: " - ",
+            keys: ["cedula", "nombreCompleto"],
+          })}
         />
       </Form.Item>
       <Form.Item

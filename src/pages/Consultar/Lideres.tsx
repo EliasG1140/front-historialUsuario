@@ -28,19 +28,19 @@ export const Lideres = () => {
     bordered: true,
     columns: [
       {
-        title: "Nombre",
+        title: "Cedula",
+        dataIndex: "cedula",
+        key: "cedula",
+      },
+      {
+        title: "Nombres",
         dataIndex: "nombre",
         key: "nombre",
       },
       {
-        title: "Apellido",
+        title: "Apellidos",
         dataIndex: "apellido",
         key: "apellido",
-      },
-      {
-        title: "Numero Identificación",
-        dataIndex: "cedula",
-        key: "cedula",
       },
       {
         title: "Puesto de votación",
