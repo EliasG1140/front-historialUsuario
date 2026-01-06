@@ -48,7 +48,7 @@ export const Login = () => {
             htmlType="submit"
             className="w-full"
           >
-            Submit
+            Iniciar sesión
           </Button>
         </Form.Item>
       </Form>
