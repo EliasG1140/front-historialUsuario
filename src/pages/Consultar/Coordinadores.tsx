@@ -1,39 +1,39 @@
 import { EyeOutlined, FileExcelOutlined } from "@ant-design/icons";
-import { getExportLideres } from "@api";
+import { getExportCoordinadores } from "@api";
 import { useGet } from "@hooks";
 import { usePersonasFilterStore } from "@stores";
 import { Button, Form, Input, Table, type TableProps } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
-export const Lideres = () => {
+export const Coordinadores = () => {
   const navigate = useNavigate();
   const setFilters = usePersonasFilterStore((state) => state.setFilters);
-  const { listLideres } = useGet();
+  const { listCoordinadores } = useGet();
 
   /* ---------------------------------- State --------------------------------- */
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  /* --------------------------------- Hnadle --------------------------------- */
+  /* --------------------------------- Handle --------------------------------- */
   const handleDownloadExcel = async () => {
-    const blob = await getExportLideres();
+    const blob = await getExportCoordinadores();
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "lideres.xlsx";
+    a.download = "coordinadores.xlsx";
     a.click();
     window.URL.revokeObjectURL(url);
   };
 
-  const getFilteredPersonas = () => {
-    if (!debouncedSearch) return listLideres;
+  const getFilteredCoordinadores = () => {
+    if (!debouncedSearch) return listCoordinadores;
     const lowerSearch = debouncedSearch.toLowerCase();
-    return (listLideres ?? []).filter(
-      (p) =>
-        p.nombre?.toLowerCase().includes(lowerSearch) ||
-        p.apellido?.toLowerCase().includes(lowerSearch) ||
-        p.cedula?.toString().toLowerCase().includes(lowerSearch),
+    return (listCoordinadores ?? []).filter(
+      (c) =>
+        c.nombre?.toLowerCase().includes(lowerSearch) ||
+        c.apellido?.toLowerCase().includes(lowerSearch) ||
+        c.cedula?.toString().toLowerCase().includes(lowerSearch),
     );
   };
 
@@ -64,9 +64,9 @@ export const Lideres = () => {
         render: (_, record) => record?.mesaVotacion?.puestoVotacion?.nombre,
       },
       {
-        title: "Personas",
-        dataIndex: "personasACargoCount",
-        key: "personasACargoCount",
+        title: "Lideres a Cargo",
+        dataIndex: "lideresCount",
+        key: "lideresCount",
       },
       {
         width: 10,
@@ -77,7 +77,7 @@ export const Lideres = () => {
               size="small"
               className="p-0!"
               onClick={() => {
-                setFilters({ liderId: record.id });
+                setFilters({ onlyLider: true, coordinadorId: record.id });
                 navigate("/home/consultar/personas");
               }}
             >
@@ -88,11 +88,10 @@ export const Lideres = () => {
       },
     ],
     pagination: false,
-    dataSource: getFilteredPersonas(),
+    dataSource: getFilteredCoordinadores(),
   };
 
   /* --------------------------------- Effect --------------------------------- */
-
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search);

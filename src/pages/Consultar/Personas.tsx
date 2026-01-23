@@ -28,6 +28,8 @@ export const Personas = () => {
     clearFilters,
     categoriaId,
     onlyLider,
+    coordinadorId,
+    onlyCoordinador,
   } = usePersonasFilterStore();
   const navigate = useNavigate();
   const user = useUserStore((state) => state.user);
@@ -41,6 +43,7 @@ export const Personas = () => {
 
   /* ---------------------------------- Watch --------------------------------- */
   const isLider = Form.useWatch("lideres", form);
+  const isCoordinador = Form.useWatch("coordinadores", form);
   const puestoVotacionWatch = Form.useWatch("puestoVotacion", form);
 
   /* ---------------------------------- Hook ---------------------------------- */
@@ -53,6 +56,7 @@ export const Personas = () => {
     codigosB,
     removePersona,
     categorias,
+    coordinadores, // Suponiendo que useGet retorna coordinadores
   } = useGet(puestoVotacionWatch, filters);
   /* --------------------------------- Handle --------------------------------- */
   const onSubmit = (values: any) => {
@@ -64,6 +68,8 @@ export const Personas = () => {
       codigoC: values.codigoC || undefined,
       codigoB: values.codigoB || undefined,
       categoria: values.categoria || undefined,
+      coordinador: values.coordinador || undefined,
+      coordinadores: values.coordinadores || undefined,
     });
   };
 
@@ -74,7 +80,7 @@ export const Personas = () => {
       (p) =>
         p.nombre?.toLowerCase().includes(lowerSearch) ||
         p.apellido?.toLowerCase().includes(lowerSearch) ||
-        p.cedula?.toString().toLowerCase().includes(lowerSearch)
+        p.cedula?.toString().toLowerCase().includes(lowerSearch),
     );
   };
 
@@ -202,18 +208,28 @@ export const Personas = () => {
     form.setFieldValue("mesaVotacion", null);
   }, [puestoVotacionWatch]);
 
+  // Reglas de habilitación/deshabilitación
   useEffect(() => {
     if (isLider) {
       form.setFieldValue("lider", null);
+      form.setFieldValue("coordinadores", false);
+    } else if (isCoordinador) {
+      form.setFieldValue("lider", null);
+      form.setFieldValue("coordinador", null);
+      form.setFieldValue("lideres", false);
     } else {
       form.setFieldValue("categoria", null);
     }
-  }, [isLider]);
+  }, [isLider, isCoordinador]);
 
   useEffect(() => {
     if (onlyLider) {
       form.setFieldValue("lideres", true);
       setFilters((prev: any) => ({ ...prev, lideres: true }));
+    }
+    if (onlyCoordinador) {
+      form.setFieldValue("coordinadores", true);
+      setFilters((prev: any) => ({ ...prev, coordinadores: true }));
     }
     if (categoriaId) {
       form.setFieldValue("categoria", categoriaId);
@@ -233,6 +249,11 @@ export const Personas = () => {
         puestoVotacion: puestoVotacionId,
       }));
     }
+    if (coordinadorId) {
+      form.setFieldValue("coordinador", coordinadorId);
+      clearFilters();
+      setFilters((prev: any) => ({ ...prev, coordinador: coordinadorId }));
+    }
   }, [
     liderId,
     puestoVotacionId,
@@ -241,6 +262,8 @@ export const Personas = () => {
     clearFilters,
     categoriaId,
     onlyLider,
+    onlyCoordinador,
+    coordinadorId,
   ]);
 
   useEffect(() => {
@@ -284,8 +307,8 @@ export const Personas = () => {
   return (
     <div className="w-full h-full flex flex-col gap-4">
       <Form layout="vertical" form={form} onFinish={onSubmit}>
-        <div className="grid grid-cols-10 gap-4">
-          <div className="flex">
+        <div className="grid grid-cols-12 gap-4">
+          <div className="flex gap-2">
             <Form.Item
               label="Lideres"
               name="lideres"
@@ -293,28 +316,50 @@ export const Personas = () => {
               className="mb-0!"
               initialValue={false}
             >
-              <Checkbox className="scale-150" />
+              <Checkbox className="scale-150" disabled={isCoordinador} />
             </Form.Item>
             <Form.Item
-              label="Categoria"
-              name="categoria"
-              className="mb-0! w-full"
+              label="Coordinadores"
+              name="coordinadores"
+              valuePropName="checked"
+              className="mb-0!"
+              initialValue={false}
             >
-              <Select
-                allowClear
-                disabled={!isLider}
-                placeholder="Categoria"
-                options={dataToSelectOptions(categorias ?? [], "id", "nombre")}
-              />
+              <Checkbox className="scale-150" disabled={isLider} />
             </Form.Item>
           </div>
+          <Form.Item
+            label="Categoria"
+            name="categoria"
+            className="mb-0! w-full"
+          >
+            <Select
+              allowClear
+              disabled={!isLider}
+              placeholder="Categoria"
+              options={dataToSelectOptions(categorias ?? [], "id", "nombre")}
+            />
+          </Form.Item>
           <Form.Item label="Lider a cargo" className="mb-0!" name="lider">
             <Select
               allowClear
               showSearch={{ optionFilterProp: "label" }}
               placeholder="Seleccione un lider asignado"
-              disabled={isLider}
+              disabled={isLider || isCoordinador}
               options={dataToSelectOptions(lideres ?? [], "id", "nombre")}
+            />
+          </Form.Item>
+          <Form.Item
+            label="Coordinador a cargo"
+            className="mb-0!"
+            name="coordinador"
+          >
+            <Select
+              allowClear
+              showSearch={{ optionFilterProp: "label" }}
+              placeholder="Seleccione un coordinador asignado"
+              disabled={isCoordinador}
+              options={dataToSelectOptions(coordinadores ?? [], "id", "nombre")}
             />
           </Form.Item>
           <Form.Item
@@ -328,7 +373,7 @@ export const Personas = () => {
               options={dataToSelectOptions(
                 puestovotacion ?? [],
                 "id",
-                "nombre"
+                "nombre",
               )}
             />
           </Form.Item>

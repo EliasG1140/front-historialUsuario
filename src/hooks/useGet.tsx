@@ -42,6 +42,8 @@ import {
   getConsultaPuestoVotacion,
   putPassword,
   isUserBlocked,
+  getCoordinadores,
+  getCoordinadoresList,
 } from "@api";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { notify } from "@utils";
@@ -56,7 +58,9 @@ export const useGet = (
     codigoB?: number | null;
     codigoC?: number | null;
     categoria?: number | null;
-  }
+    coordinador?: number | null;
+    coordinadores?: boolean | null;
+  },
 ) => {
   /* ---------------------------------- Auth ---------------------------------- */
   const { data: isBlocked } = useQuery({
@@ -386,6 +390,8 @@ export const useGet = (
         codigoB: personaFilters?.codigoB ?? undefined,
         codigoC: personaFilters?.codigoC ?? undefined,
         categoria: personaFilters?.categoria ?? undefined,
+        coordinador: personaFilters?.coordinador ?? undefined,
+        coordinadores: personaFilters?.coordinadores ?? undefined,
       }),
     staleTime: 0,
     refetchInterval: 5000,
@@ -456,6 +462,12 @@ export const useGet = (
     staleTime: 0,
   });
 
+  const { data: coordinadores } = useQuery({
+    queryKey: [QUERY_KEYS.GET.COORDINADORES],
+    queryFn: getCoordinadores,
+    staleTime: 0,
+  });
+
   /* -------------------------------- Usuarios -------------------------------- */
   const { data: usuarios } = useQuery({
     queryKey: [QUERY_KEYS.GET.USUARIOS],
@@ -485,7 +497,7 @@ export const useGet = (
       notify.openNotification(
         "success",
         "Usuario agregado",
-        `La contraseña es: ${password} y se ha copiado al portapapeles.`
+        `La contraseña es: ${password} y se ha copiado al portapapeles.`,
       );
       navigator.clipboard.writeText(password);
       queryClient.invalidateQueries({
@@ -527,7 +539,7 @@ export const useGet = (
       notify.openNotification(
         "success",
         "Contraseña recuperada",
-        `Su nueva contraseña es: ${newPassword} y se ha copiado al portapapeles.`
+        `Su nueva contraseña es: ${newPassword} y se ha copiado al portapapeles.`,
       );
       navigator.clipboard.writeText(newPassword);
       queryClient.invalidateQueries({
@@ -565,6 +577,12 @@ export const useGet = (
   const { data: listLideres } = useQuery({
     queryKey: [QUERY_KEYS.GET.LIDERES_LIST],
     queryFn: () => getLideresList(),
+    staleTime: 0,
+  });
+
+  const { data: listCoordinadores } = useQuery({
+    queryKey: [QUERY_KEYS.GET.COORDINADORES_LIST],
+    queryFn: () => getCoordinadoresList(),
     staleTime: 0,
   });
 
@@ -619,5 +637,7 @@ export const useGet = (
     listLideres,
     consultaPuestoVotacion,
     isBlocked,
+    coordinadores,
+    listCoordinadores
   };
 };

@@ -16,8 +16,9 @@ class ApiClient {
 
   constructor() {
     this.instance = axios.create({
-      baseURL: "https://8pwrgng6-5062.use.devtunnels.ms/api",
-      // baseURL: "http://localhost:5062/api",
+      // baseURL: "https://8pwrgng6-5062.use.devtunnels.ms/api",
+      baseURL: "http://localhost:5062/api",
+      // baseURL: "http://192.168.1.7:5062/api",
       // baseURL: "http://{IP:PORT}/api",
       timeout: 10000,
     });

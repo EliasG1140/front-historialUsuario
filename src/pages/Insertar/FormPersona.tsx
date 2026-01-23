@@ -14,7 +14,7 @@ import {
   Select,
   Space,
 } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 interface IFormPersonaProps {
@@ -33,7 +33,11 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
 
   /* ---------------------------------- Watch --------------------------------- */
   const isLider = Form.useWatch("esLider", form);
+  const isCoordinador = Form.useWatch("esCoordinador", form);
   const puestoVotacionWatch = Form.useWatch("puestoVotacion", form);
+
+  // Persona normal: no es líder ni coordinador
+  const isPersonaNormal = !isLider && !isCoordinador;
 
   /* ---------------------------------- Hook ---------------------------------- */
   const {
@@ -43,30 +47,31 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
     codigosB,
     codigosC,
     mesasVotacion,
-    listLideres,
+    lideres,
+    coordinadores,
   } = useGet(puestoVotacionWatch);
-
-  /* ---------------------------------- Memo ---------------------------------- */
-  const lideres = useMemo(() => {
-    const data = listLideres ?? [];
-    return data.map((lider) => ({
-      ...lider,
-      nombreCompleto: `${lider.nombre} ${lider.apellido}${
-        lider.apodo ? ` (${lider.apodo})` : ""
-      }`,
-    }));
-  }, [listLideres]);
 
   /* --------------------------------- Effects -------------------------------- */
   useEffect(() => {
     form.setFieldValue("mesaVotacion", null);
   }, [puestoVotacionWatch]);
 
+  // Si es líder, limpiar campo líder y desmarcar coordinador
   useEffect(() => {
     if (isLider) {
       form.setFieldValue("lider", null);
+      form.setFieldValue("esCoordinador", false);
     }
   }, [isLider]);
+
+  // Si es coordinador, limpiar campo coordinador y desmarcar líder
+  useEffect(() => {
+    if (isCoordinador) {
+      form.setFieldValue("coordinador", null);
+      form.setFieldValue("esLider", false);
+      form.setFieldValue("lider", null); // Un coordinador no debe tener líder
+    }
+  }, [isCoordinador]);
 
   useEffect(() => {
     if (isEdit && data) {
@@ -109,6 +114,14 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
       >
         <Input />
       </Form.Item>
+      <Form.Item
+        rules={[{ required: true, message: "Campo requerido." }]}
+        className="mb-0!"
+        name="familia"
+        label="Familia"
+      >
+        <Input />
+      </Form.Item>
 
       <Form.Item
         rules={[{ required: true, message: "Campo requerido." }]}
@@ -125,6 +138,7 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
         <Space.Compact block>
           <Form.Item className="mb-0! w-[50%]" name="barrio">
             <Select
+              showSearch={{ optionFilterProp: "label" }}
               options={dataToSelectOptions(barrios ?? [], "id", "nombre")}
               placeholder="Seleccione un barrio"
             />
@@ -137,6 +151,7 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
       </Form.Item>
       <Form.Item className="mb-0!" name="lengua" label="Lengua">
         <Select
+          showSearch={{ optionFilterProp: "label" }}
           options={dataToSelectOptions(lenguas ?? [], "id", "nombre")}
           placeholder="Seleccione una o varias lenguas"
           mode="multiple"
@@ -150,6 +165,7 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
         label="Puesto de votacion"
       >
         <Select
+          showSearch={{ optionFilterProp: "label" }}
           placeholder="Seleccione un puesto de votacion"
           options={dataToSelectOptions(puestovotacion ?? [], "id", "nombre")}
         />
@@ -161,6 +177,7 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
         label="Mesa de votacion"
       >
         <Select
+          showSearch={{ optionFilterProp: "label" }}
           placeholder="Seleccione una mesa de votacion"
           disabled={!puestoVotacionWatch}
           options={dataToSelectOptions(mesasVotacion ?? [], "id", "nombre")}
@@ -173,20 +190,48 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
         label="Codigo C"
       >
         <Select
+          showSearch={{ optionFilterProp: "label" }}
           options={dataToSelectOptions(codigosC ?? [], "id", "nombre")}
           placeholder="Seleccione un codigo C"
         />
       </Form.Item>
       <Form.Item className="mb-0!" name="codigob" label="Codigo B">
         <Select
+          showSearch={{ optionFilterProp: "label" }}
           options={dataToSelectOptions(codigosB ?? [], "id", "nombre")}
           placeholder="Seleccione uno o varios codigo B"
           mode="multiple"
           allowClear
         />
       </Form.Item>
+
+      {/* Coordinador asignado */}
       <Form.Item
-        rules={[{ required: !isLider, message: "Campo requerido." }]}
+        rules={[
+          {
+            required: isLider || isPersonaNormal,
+            message: "Campo requerido.",
+          },
+        ]}
+        className="mb-0!"
+        name="coordinador"
+        label="Coordinador asignado"
+      >
+        <Select
+          showSearch={{ optionFilterProp: "label" }}
+          placeholder="Seleccione un coordinador asignado"
+          disabled={isCoordinador}
+          options={dataToSelectOptions(coordinadores ?? [], "id", "nombre")}
+        />
+      </Form.Item>
+      {/* Líder asignado */}
+      <Form.Item
+        rules={[
+          {
+            required: isPersonaNormal,
+            message: "Campo requerido.",
+          },
+        ]}
         className="mb-0!"
         name="lider"
         label="Lider asignado"
@@ -194,25 +239,33 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
         <Select
           showSearch={{ optionFilterProp: "label" }}
           placeholder="Seleccione un lider asignado"
-          disabled={isLider}
-          options={dataToSelectOptions(lideres ?? [], "id", "nombre", false, {
-            combineLabel: true,
-            separator: " - ",
-            keys: ["cedula", "nombreCompleto"],
-          })}
+          disabled={isLider || isCoordinador}
+          options={dataToSelectOptions(lideres ?? [], "id", "nombre")}
         />
       </Form.Item>
+
+      <div className="flex justify-around">
+        <Form.Item
+          className="mb-0!"
+          name="esLider"
+          label="Es Lider ?"
+          valuePropName="checked"
+          initialValue={false}
+        >
+          <Checkbox className="scale-150" disabled={isCoordinador} />
+        </Form.Item>
+        <Form.Item
+          className="mb-0!"
+          name="esCoordinador"
+          label="Es Coordinador ?"
+          valuePropName="checked"
+          initialValue={false}
+        >
+          <Checkbox className="scale-150" disabled={isLider} />
+        </Form.Item>
+      </div>
       <Form.Item
-        className="mb-0!"
-        name="esLider"
-        label="Es lider?"
-        valuePropName="checked"
-        initialValue={false}
-      >
-        <Checkbox className="scale-150" />
-      </Form.Item>
-      <Form.Item
-        className="mb-0! col-span-2"
+        className="mb-0! col-span-3"
         name="descripcion"
         label="Descripcion"
       >

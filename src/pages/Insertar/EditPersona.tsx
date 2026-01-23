@@ -68,6 +68,9 @@ export const EditPersona = () => {
       codigob: values?.codigosBIds,
       lider: values?.liderId,
       esLider: values?.isLider,
+      esCoordinador: values?.isCoordinador,
+      coordinador: values?.coordinadorId,
+      familia: values.familia,
     });
   };
 

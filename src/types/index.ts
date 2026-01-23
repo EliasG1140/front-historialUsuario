@@ -87,11 +87,14 @@ export interface IGetPersonaById {
   telefono: string;
   direccion: string;
   descripcion: string | null;
+  familia: string;
   isLider: boolean;
+  isCoordinador: boolean;
   barrioId: number;
   codigoCId: number;
   lenguasIds: number[];
   liderId: number | null;
+  coordinadorId: number | null;
   mesaVotacion: {
     id: number;
     nombre: string;

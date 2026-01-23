@@ -14,6 +14,10 @@ export const Consulta = () => {
       label: "Lideres",
     },
     {
+      key: "coordinadores",
+      label: "Coordinadores",
+    },
+    {
       key: "puestos-votacion",
       label: "Puestos de votacion",
     },

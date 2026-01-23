@@ -205,13 +205,13 @@ export const deletePuestoVotacion = async (id: number): Promise<any> => {
 };
 
 export const getMesasByPuesto = async (
-  puestoId: number
+  puestoId: number,
 ): Promise<ICatalogo[]> => {
   const { data } = await apiClient.get<ICatalogo[]>(
     `/votacion/puestos/${puestoId}/mesas`,
     {
       needAuth: false,
-    }
+    },
   );
   return data;
 };
@@ -227,6 +227,16 @@ export const getLideres = async (): Promise<ICatalogo[]> => {
   return data;
 };
 
+export const getCoordinadores = async (): Promise<ICatalogo[]> => {
+  const { data } = await apiClient.get<ICatalogo[]>(
+    "/catalogos/coordinadores",
+    {
+      needAuth: false,
+    },
+  );
+  return data;
+};
+
 export const getPersonas = async ({
   lider,
   lideres,
@@ -235,6 +245,8 @@ export const getPersonas = async ({
   codigoB,
   codigoC,
   categoria,
+  coordinador,
+  coordinadores,
 }: {
   lider?: number;
   lideres?: boolean;
@@ -243,12 +255,14 @@ export const getPersonas = async ({
   codigoB?: number;
   codigoC?: number;
   categoria?: number;
+  coordinador?: number;
+  coordinadores?: boolean;
 }): Promise<IGetPersona[]> => {
   const { data } = await apiClient.get<IGetPersona[]>(
-    `/personas?lider=${lider}&lideres=${lideres}&puestoVotacion=${puestoVotacion}&mesaVotacion=${mesaVotacion}&codigoB=${codigoB}&codigoC=${codigoC}&categoria=${categoria}`,
+    `/personas?lider=${lider}&lideres=${lideres}&puestoVotacion=${puestoVotacion}&mesaVotacion=${mesaVotacion}&codigoB=${codigoB}&codigoC=${codigoC}&categoria=${categoria}&coordinador=${coordinador}&coordinadores=${coordinadores}`,
     {
       needAuth: true,
-    }
+    },
   );
   return data;
 };
@@ -280,6 +294,12 @@ export const deletePersona = async (id: number): Promise<any> => {
 
 export const getLideresList = async (): Promise<any[]> => {
   const { data } = await apiClient.get<any>("/personas/lideres", {
+    needAuth: true,
+  });
+  return data;
+};
+export const getCoordinadoresList = async (): Promise<any[]> => {
+  const { data } = await apiClient.get<any>("/personas/coordinadores", {
     needAuth: true,
   });
   return data;
@@ -319,21 +339,21 @@ export const putRecoveryUsuario = async (id: string): Promise<any> => {
     null,
     {
       needAuth: false,
-    }
+    },
   );
   return result;
 };
 
 export const putChangeRoleUsuario = async (
   id: string,
-  newRole: string
+  newRole: string,
 ): Promise<any> => {
   await apiClient.put<any>(
     `/auth/usuario/${id}/rol`,
     { userId: id, newRole },
     {
       needAuth: false,
-    }
+    },
   );
 };
 
@@ -346,7 +366,7 @@ export const getConsultaPuestoVotacion =
       "/votacion/puestos/consulta",
       {
         needAuth: false,
-      }
+      },
     );
     return data;
   };
@@ -360,13 +380,21 @@ export const getExportPersonas = async (payload: any): Promise<Blob> => {
     {
       needAuth: true,
       responseType: "blob",
-    }
+    },
   );
   return data;
 };
 
 export const getExportLideres = async (): Promise<Blob> => {
   const { data } = await apiClient.get<Blob>(`/personas/lideres/excel`, {
+    needAuth: true,
+    responseType: "blob",
+  });
+  return data;
+};
+
+export const getExportCoordinadores = async (): Promise<Blob> => {
+  const { data } = await apiClient.get<Blob>(`/personas/coordinadores/excel`, {
     needAuth: true,
     responseType: "blob",
   });

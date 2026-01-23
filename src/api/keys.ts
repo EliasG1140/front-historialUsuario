@@ -6,6 +6,8 @@ export const QUERY_KEYS = {
     CATEGORIAS: "get_categorias",
     LIDERES: "get_lideres",
     LIDERES_LIST: "get_lideres_list",
+    COORDINADORES: "get_coordinadores",
+    COORDINADORES_LIST: "get_coordinadores_list",
     CODIGOC: "get_codigoc",
     CODIGOB: "get_codigob",
     PUESTOVOTACION: "get_puestovotacion",

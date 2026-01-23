@@ -18,6 +18,7 @@ import { AddPersona } from "./pages/Insertar/AddPersona";
 import { PrivateRoute } from "./components/PrivateRoute";
 import { TerminoCondicion } from "./pages/TerminoCondicion";
 import { EditPersona } from "./pages/Insertar/EditPersona";
+import { Coordinadores } from "./pages/Consultar/Coordinadores";
 
 export const App = () => {
   return (
@@ -33,6 +34,7 @@ export const App = () => {
                 <Route index element={<Personas />} />
                 <Route path="personas" element={<Personas />} />
                 <Route path="lideres" element={<Lideres />} />
+                <Route path="coordinadores" element={<Coordinadores />} />
                 <Route
                   path="puestos-votacion"
                   element={<ConsultaPuestoVotacion />}
