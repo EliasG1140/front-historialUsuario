@@ -376,7 +376,7 @@ export const getConsultaPuestoVotacion =
 /* -------------------------------------------------------------------------- */
 export const getExportPersonas = async (payload: any): Promise<Blob> => {
   const { data } = await apiClient.get<Blob>(
-    `/personas/excel?lider=${payload.lider}&lideres=${payload.lideres}&puestoVotacion=${payload.puestoVotacion}&mesaVotacion=${payload.mesaVotacion}&codigoB=${payload.codigoB}&codigoC=${payload.codigoC}&categoria=${payload.categoria}`,
+    `/personas/excel?lider=${payload.lider}&lideres=${payload.lideres}&puestoVotacion=${payload.puestoVotacion}&mesaVotacion=${payload.mesaVotacion}&codigoB=${payload.codigoB}&codigoC=${payload.codigoC}&categoria=${payload.categoria}&coordinador=${payload.coordinador}&coordinadores=${payload.coordinadores}`,
     {
       needAuth: true,
       responseType: "blob",

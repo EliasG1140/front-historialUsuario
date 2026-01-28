@@ -2,10 +2,14 @@ import { Form } from "antd";
 import { FormPersona } from "./FormPersona";
 import { useGet } from "@hooks";
 import { notify } from "@utils";
+import { useState } from "react";
 
 export const AddPersona = () => {
   /* ---------------------------------- Hook ---------------------------------- */
   const { addPersona } = useGet();
+
+  /* ---------------------------------- State --------------------------------- */
+  const [formPersonaKey, setFormPersonaKey] = useState(0);
 
   /* ---------------------------------- Form ---------------------------------- */
   const [form] = Form.useForm();
@@ -24,6 +28,7 @@ export const AddPersona = () => {
     addPersona(payload)
       .then(() => {
         form.resetFields();
+        setFormPersonaKey((prev) => prev + 1);
         notify.success("Persona agregada con éxito");
       })
       .catch((error: any) => {
@@ -45,7 +50,7 @@ export const AddPersona = () => {
         form={form}
         className="grid grid-cols-3 gap-4"
       >
-        <FormPersona />
+        <FormPersona key={formPersonaKey} />
       </Form>
     </div>
   );

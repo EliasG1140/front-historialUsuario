@@ -36,7 +36,7 @@ export const EditPersona = () => {
       payload.codigob = null;
     }
 
-    if(values.lengua?.length !== 0) {
+    if (values.lengua?.length !== 0) {
       payload.lengua = values.lengua;
     } else {
       payload.lengua = null;
@@ -71,6 +71,8 @@ export const EditPersona = () => {
       esCoordinador: values?.isCoordinador,
       coordinador: values?.coordinadorId,
       familia: values.familia,
+      verfAdres: values.verfAdres,
+      verfPuestoVotacion: values.verfPuestoVotacion,
     });
   };
 

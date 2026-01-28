@@ -35,6 +35,7 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
   const isLider = Form.useWatch("esLider", form);
   const isCoordinador = Form.useWatch("esCoordinador", form);
   const puestoVotacionWatch = Form.useWatch("puestoVotacion", form);
+  const mesaVotacionWatch = Form.useWatch("mesaVotacion", form);
 
   // Persona normal: no es líder ni coordinador
   const isPersonaNormal = !isLider && !isCoordinador;
@@ -114,21 +115,11 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
       >
         <Input />
       </Form.Item>
-      <Form.Item
-        rules={[{ required: true, message: "Campo requerido." }]}
-        className="mb-0!"
-        name="familia"
-        label="Familia"
-      >
+      <Form.Item className="mb-0!" name="familia" label="Familia">
         <Input />
       </Form.Item>
 
-      <Form.Item
-        rules={[{ required: true, message: "Campo requerido." }]}
-        className="mb-0!"
-        name="telefono"
-        label="Telefono"
-      >
+      <Form.Item className="mb-0!" name="telefono" label="Telefono">
         <Input maxLength={10} />
       </Form.Item>
       <Form.Item className="mb-0!" name="apodo" label="Apodo">
@@ -158,31 +149,67 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
           allowClear
         />
       </Form.Item>
-      <Form.Item
-        rules={[{ required: true, message: "Campo requerido." }]}
-        className="mb-0!"
-        name="puestoVotacion"
-        label="Puesto de votacion"
-      >
-        <Select
-          showSearch={{ optionFilterProp: "label" }}
-          placeholder="Seleccione un puesto de votacion"
-          options={dataToSelectOptions(puestovotacion ?? [], "id", "nombre")}
-        />
+
+      <Form.Item label="Puesto de votacion" className="mb-0!">
+        <Space.Compact block>
+          <Form.Item className="mb-0! w-[90%]" name="puestoVotacion">
+            <Select
+              showSearch={{ optionFilterProp: "label" }}
+              placeholder="Seleccione un puesto de votacion"
+              options={dataToSelectOptions(
+                puestovotacion ?? [],
+                "id",
+                "nombre",
+              )}
+            />
+          </Form.Item>
+          <Form.Item className="mb-0! w-[10%]">
+            <Button
+              icon={<CloseOutlined />}
+              className="w-full!"
+              disabled={!puestoVotacionWatch}
+              onClick={() =>
+                form.setFieldsValue({
+                  puestoVotacion: null,
+                  mesasVotacion: null,
+                })
+              }
+            />
+          </Form.Item>
+        </Space.Compact>
       </Form.Item>
-      <Form.Item
-        rules={[{ required: true, message: "Campo requerido." }]}
-        className="mb-0!"
-        name="mesaVotacion"
-        label="Mesa de votacion"
-      >
-        <Select
-          showSearch={{ optionFilterProp: "label" }}
-          placeholder="Seleccione una mesa de votacion"
-          disabled={!puestoVotacionWatch}
-          options={dataToSelectOptions(mesasVotacion ?? [], "id", "nombre")}
-        />
+
+      <Form.Item label="Mesa de votacion" className="mb-0!">
+        <Space.Compact block>
+          <Form.Item
+            {...(puestoVotacionWatch && {
+              rules: [{ required: true, message: "Campo requerido." }],
+            })}
+            className="mb-0! w-[90%]"
+            name="mesaVotacion"
+          >
+            <Select
+              showSearch={{ optionFilterProp: "label" }}
+              placeholder="Seleccione una mesa de votacion"
+              disabled={!puestoVotacionWatch}
+              options={dataToSelectOptions(mesasVotacion ?? [], "id", "nombre")}
+            />
+          </Form.Item>
+          <Form.Item className="mb-0! w-[10%]">
+            <Button
+              icon={<CloseOutlined />}
+              className="w-full!"
+              disabled={!mesaVotacionWatch}
+              onClick={() =>
+                form.setFieldsValue({
+                  mesaVotacion: null,
+                })
+              }
+            />
+          </Form.Item>
+        </Space.Compact>
       </Form.Item>
+
       <Form.Item
         rules={[{ required: true, message: "Campo requerido." }]}
         className="mb-0!"
@@ -265,12 +292,32 @@ export const FormPersona = ({ edit, data }: IFormPersonaProps) => {
         </Form.Item>
       </div>
       <Form.Item
-        className="mb-0! col-span-3"
+        className="mb-0! col-span-2"
         name="descripcion"
         label="Descripcion"
       >
         <Input.TextArea />
       </Form.Item>
+      <div className="flex justify-around">
+        <Form.Item
+          className="mb-0!"
+          name="verfAdres"
+          label="Verificación ADRES"
+          valuePropName="checked"
+          initialValue={false}
+        >
+          <Checkbox className="scale-150" />
+        </Form.Item>
+        <Form.Item
+          className="mb-0!"
+          name="verfPuestoVotacion"
+          label="Verificación Puesto de votación"
+          valuePropName="checked"
+          initialValue={false}
+        >
+          <Checkbox className="scale-150" />
+        </Form.Item>
+      </div>
       <Form.Item className="mb-0! col-span-3 flex justify-end">
         <div className="flex gap-2">
           {isEdit && (

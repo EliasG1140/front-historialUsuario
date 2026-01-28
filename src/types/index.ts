@@ -109,6 +109,8 @@ export interface IGetPersonaById {
   createdBy?: string;
   lastModifiedAt?: string;
   lastModifiedBy?: string;
+  verfAdres: boolean;
+  verfPuestoVotacion: boolean;
 }
 
 /* --------------------------------- Lideres -------------------------------- */
